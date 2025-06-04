@@ -6,6 +6,7 @@ import { useTickerData } from "@/hooks/useTickerData";
 import { formatCurrency } from "@/lib/currency";
 import { formatAge } from "@/lib/time";
 
+import { AnimatedValue } from "./animated-value";
 import { ProgressBar } from "./progress-bar";
 
 interface ItemMoverProps {
@@ -20,24 +21,14 @@ interface LabelValueProps {
 const LabelValue: React.FC<LabelValueProps> = ({ label, value }) => {
   return (
     <View className="flex flex-row items-center justify-between">
-      <View className="flex flex-1">
-        <Text
-          numberOfLines={1}
-          adjustsFontSizeToFit
-          className="text-text-tertiary text-base font-semibold uppercase"
-        >
-          {label}
-        </Text>
-      </View>
-      <View className="flex flex-1">
-        <Text
-          numberOfLines={1}
-          adjustsFontSizeToFit
-          className="text-text-primary text-right text-base font-semibold"
-        >
-          {value}
-        </Text>
-      </View>
+      <AnimatedValue
+        value={label}
+        textClassName="text-text-tertiary text-base font-semibold uppercase"
+      />
+      <AnimatedValue
+        value={value}
+        textClassName="text-text-primary text-right text-base font-semibold"
+      />
     </View>
   );
 };
@@ -68,9 +59,13 @@ export const ItemMover: React.FC<ItemMoverProps> = ({ ticker }) => {
           </View>
           <View className="flex flex-1 bg-background-secondary rounded" />
         </View>
-        <ProgressBar progress={normalizedProgress} springPreset="playful" />
+        <ProgressBar
+          height={4}
+          progress={normalizedProgress}
+          springPreset="playful"
+        />
       </View>
-      <View className="flex flex-col justify-between w-3/12 -mt-1 -mb-1">
+      <View className="flex flex-col justify-between w-3/12 -mt-2">
         <LabelValue label="age" value={formatAge(createdAt)} />
         <LabelValue label="mcp" value={formatCurrency(mcap)} />
         <LabelValue label="ath" value={formatCurrency(ath)} />
