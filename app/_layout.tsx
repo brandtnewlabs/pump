@@ -17,9 +17,9 @@ interface TabConfig {
 const TAB_CONFIGS: readonly TabConfig[] = [
   { name: "(home)", title: "Home", iconName: "home" },
   { name: "search", title: "Search", iconName: "search" },
-  { name: "chat", title: "Chat", iconName: "comment-discussion" },
-  { name: "portfolio", title: "Portfolio", iconName: "person" },
   { name: "notifications", title: "Notifications", iconName: "bell" },
+  { name: "portfolio", title: "Portfolio", iconName: "person" },
+  { name: "chat", title: "Chat", iconName: "comment-discussion" },
 ] as const;
 
 const TAB_SCREEN_OPTIONS: BottomTabNavigationOptions = {

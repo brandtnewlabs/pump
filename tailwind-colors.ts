@@ -41,6 +41,7 @@ const background = {
   primary: base[950],
   secondary: base[900],
   tertiary: base[800],
+  brand: primary[400],
   inverse: white,
 };
 
@@ -49,6 +50,8 @@ const text = {
   secondary: base[100],
   tertiary: base[200],
   brand: primary[400],
+  brandDark: primary[900],
+  inverse: white,
 };
 
 export default {

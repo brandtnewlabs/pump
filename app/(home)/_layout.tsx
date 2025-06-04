@@ -3,6 +3,7 @@ import { StatusBar } from "expo-status-bar";
 import { Dimensions } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { FloatingButton } from "@/components/button-floating";
 import tailwindColors from "@/tailwind-colors";
 import {
   MaterialTopTabNavigationEventMap,
@@ -80,7 +81,7 @@ export default function TabLayout() {
   return (
     <SafeAreaView
       edges={["top"]}
-      className="flex flex-col flex-1 bg-background-primary"
+      className="flex flex-col flex-1 bg-background-primary relative"
     >
       <StatusBar style="light" />
       <MaterialTopTabs
@@ -95,6 +96,13 @@ export default function TabLayout() {
           />
         ))}
       </MaterialTopTabs>
+
+      <FloatingButton
+        octicon="plus"
+        variant="primary"
+        className="absolute bottom-4 right-4"
+        onPress={() => console.log("Add pressed")}
+      />
     </SafeAreaView>
   );
 }
