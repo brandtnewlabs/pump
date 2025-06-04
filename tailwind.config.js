@@ -11,9 +11,9 @@ module.exports = {
         text,
       },
       fontFamily: {
-        "inter-regular": ["Inter-Regular", "sans-serif"],
-        "inter-bold": ["Inter-Bold", "sans-serif"],
-        "inter-semibold": ["Inter-SemiBold", "sans-serif"],
+        "inter-bold": ["Inter-Bold"],
+        "inter-regular": ["Inter-Regular"],
+        "inter-semibold": ["Inter-SemiBold"],
       },
     },
   },

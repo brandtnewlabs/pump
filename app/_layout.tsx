@@ -2,6 +2,7 @@ import "../global.css";
 
 import { Tabs } from "expo-router";
 
+import { useFontLoader } from "@/hooks/useFontLoader";
 import tailwindColors from "@/tailwind-colors";
 import { Octicons } from "@expo/vector-icons";
 import { BottomTabNavigationOptions } from "@react-navigation/bottom-tabs";
@@ -38,6 +39,8 @@ const TAB_SCREEN_OPTIONS: BottomTabNavigationOptions = {
 };
 
 export default function RootLayout() {
+  const { fontsLoaded } = useFontLoader();
+
   const renderTabIcon = (iconName: keyof typeof Octicons.glyphMap) => {
     const TabIcon = ({ color }: { color: string }) => (
       <Octicons name={iconName} size={24} color={color} />

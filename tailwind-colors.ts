@@ -47,8 +47,8 @@ const background = {
 
 const text = {
   primary: base[50],
-  secondary: base[100],
-  tertiary: base[200],
+  secondary: base[200],
+  tertiary: base[500],
   brand: primary[400],
   brandDark: primary[900],
   inverse: white,

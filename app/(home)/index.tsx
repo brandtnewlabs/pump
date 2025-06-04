@@ -1,9 +1,11 @@
-import { Text, View } from "react-native";
+import { View } from "react-native";
+
+import { ItemMover } from "@/components/item-mover";
 
 export default function Screen() {
   return (
-    <View className="flex flex-col flex-1 justify-center items-center bg-background-primary">
-      <Text className="text-text-primary">Movers</Text>
+    <View className="flex flex-col flex-1 bg-background-primary">
+      <ItemMover ticker="AAPL" />
     </View>
   );
 }
