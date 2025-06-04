@@ -1,0 +1,65 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+# Expo, React Native, and React Best Practices
+
+## Project Structure
+- Organize code by domain or feature when possible, but always keep shared UI components in `/components` and hooks in `/hooks`.
+- Never create components within `app/components`—always use the root `/components` directory.
+- Place all custom hooks in `/hooks`.
+- Store assets (images, fonts, icons) in `/assets`.
+- Use import aliases to avoid long relative paths (e.g., `import Button from 'components/Button'`).
+
+## TypeScript
+- Always use TypeScript for new code.
+- Never use `any`—define precise types or interfaces. Before creating a new type, check `types/index.ts` for existing definitions.
+- Prefer explicit types for props, state, and function signatures.
+
+## Components & Hooks
+- Never use hooks conditionally, inside loops, or inside maps.
+- Keep components small and focused; split large components into smaller ones.
+- Destructure props for readability and maintainability.
+- Use `React.memo` for pure components to avoid unnecessary re-renders, especially in lists.
+- Use `useCallback` and `useMemo` to memoize functions and values passed to child components.
+
+## Styling
+- For styling, always use NativeWind (TailWind for React Native)
+
+## State Management
+- Prefer local state for UI logic; use our Zustand for simple global state.
+- Always update state immutably.
+
+## Performance
+- Use `FlatList` or `SectionList` for large lists; avoid rendering large arrays with `.map` directly in JSX.
+- Use `getItemLayout` and control `initialNumToRender` in lists for better performance.
+- Optimize images (resize, use WebP, preload with `expo-asset`).
+- Use `React.memo` and avoid unnecessary re-renders.
+- Use `react-native-reanimated` for aninmations
+
+## Navigation & Routing
+- Use Expo Router for file-based navigation in new projects.
+- Use deep linking and type-safe navigation where possible.
+
+## Error Handling & Logging
+- Use Error Boundaries for critical UI sections.
+- Integrate crash analytics (Sentry)
+- Use [useAnalytics.ts](mdc:hooks/useAnalytics.ts) for our analytics and it's trackError function for logging errors
+- Never log sensitive user information.
+
+## Updates & CI/CD
+- Use Expo EAS for cloud builds, OTA updates, and app store submissions.
+- Regularly upgrade Expo SDK and dependencies; check changelogs for breaking changes.
+- Use `expo-doctor` to check for dependency issues.
+
+## General Guidelines
+- When a file or function becomes too long, split it into smaller files/functions.
+- After each code change, reflect on scalability and maintainability. Suggest improvements or next steps as needed.
+- Document project structure and architectural decisions for new contributors.
+
+## References
+- [Expo Documentation](mdc:https:/docs.expo.dev)
+- [React Native Documentation](mdc:https:/reactnative.dev/docs/getting-started)
+- [React Native Best Practices 2024](mdc:https:/dev.to/hellonehha/react-native-code-practices-6dl)
+- [Expo Blog: Best Practices](mdc:https:/expo.dev/blog/best-practices-for-reducing-lag-in-expo-apps)

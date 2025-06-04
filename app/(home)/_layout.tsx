@@ -81,7 +81,7 @@ export default function TabLayout() {
   return (
     <SafeAreaView
       edges={["top"]}
-      className="flex flex-col flex-1 bg-background-primary relative"
+      className="relative flex flex-1 flex-col bg-background-primary"
     >
       <StatusBar style="light" />
       <MaterialTopTabs

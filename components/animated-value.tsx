@@ -1,138 +1,97 @@
-import React, { useEffect } from "react";
-import { StyleSheet, TextInput, View } from "react-native";
+import React, { useCallback, useEffect, useRef } from "react";
+import { Text } from "react-native";
 import Animated, {
-  useAnimatedProps,
   useAnimatedStyle,
   useSharedValue,
 } from "react-native-reanimated";
 
-import { withTimingInstant } from "@/animations/motion";
+import { motion } from "@/animations";
 import { cn } from "@/lib/cn";
 
-// Add text to whitelisted props for animation
-Animated.addWhitelistedNativeProps({ text: true });
+// Animation configuration constants - centralized for easy maintenance
+const ANIMATION_CONFIG = {
+  // Intermediate opacity during transition (creates a subtle flash effect)
+  FADE_OPACITY: 0.7,
+  // Intermediate scale during transition (creates a subtle shrink effect)
+  SCALE_VALUE: 0.95,
+} as const;
 
-// Create animated TextInput component
-const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
-
-// Animation constants
-const MAX_TRANSLATE_Y = 10;
-
-// Styles outside component to avoid recreation
-const styles = StyleSheet.create({
-  characterContainer: {
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});
-
-/**
- * AnimatedCharacter displays a single character with entry/exit animation when the value changes.
- * Uses react-native-reanimated for smooth transitions.
- */
-const AnimatedCharacter: React.FC<{
-  char: string;
-  textClassName?: string;
-  index: number;
-}> = React.memo(({ char, textClassName, index }) => {
-  // Store the previous character to detect changes
-  const prevChar = React.useRef<string>(char);
-  // Shared values for animation
-  const charValue = useSharedValue<string>(char);
-  const opacity = useSharedValue<number>(1);
-  const translateY = useSharedValue<number>(0);
-
-  useEffect(() => {
-    // If the character changes, animate out then in
-    if (char !== prevChar.current) {
-      // Add slight delay based on index for staggered animation
-      const delay = index * 20;
-
-      setTimeout(() => {
-        opacity.value = withTimingInstant(0); // Fade out
-        translateY.value = withTimingInstant(MAX_TRANSLATE_Y); // Move down
-
-        // After out animation, update value and animate in
-        setTimeout(() => {
-          charValue.value = char;
-          opacity.value = withTimingInstant(1); // Fade in
-          translateY.value = withTimingInstant(0); // Move up
-        }, 100); // 100ms matches the 'quick' duration
-      }, delay);
-
-      prevChar.current = char;
-    }
-  }, [char, charValue, opacity, translateY, index]);
-
-  // Animated style for fade/slide effect
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      opacity: opacity.value,
-      transform: [{ translateY: translateY.value }],
-    };
-  });
-
-  // Animated props for TextInput (text value)
-  const animatedProps = useAnimatedProps(() => {
-    return {
-      text: charValue.value,
-      defaultValue: charValue.value,
-    };
-  });
-
-  return (
-    <View style={styles.characterContainer}>
-      <Animated.View style={animatedStyle}>
-        <AnimatedTextInput
-          className={textClassName}
-          editable={false}
-          animatedProps={animatedProps}
-          defaultValue={char}
-        />
-      </Animated.View>
-    </View>
-  );
-});
-
-AnimatedCharacter.displayName = "AnimatedCharacter";
-
-/**
- * Props for the AnimatedValue component
- */
 interface AnimatedValueProps {
-  /** The value to display and animate */
+  /** The value to display and animate. When this changes, the component triggers animation */
   value: string;
-  /** Optional className for the container */
+  /** Optional Tailwind className for the container wrapper */
   containerClassName?: string;
-  /** Optional className for the text */
+  /** Optional Tailwind className for the text element */
   textClassName?: string;
 }
 
 /**
- * AnimatedValue component displays text with smooth animations when the value changes.
+ * AnimatedValue Component
  *
- * - Uses reanimated for character transitions with staggered timing
- * - Animates each character individually for smooth effect
- * - Accepts custom styling via className props
+ * A performant component that displays a value with smooth fade and scale animations
+ * when the value changes. Uses react-native-reanimated for 60fps animations.
+ *
+ * Animation behavior:
+ * - When value changes: fades to 70% opacity and scales to 95%
+ * - Then returns to full opacity and normal scale
+ * - Uses the app's centralized animation system for consistent timing
+ *
+ * Performance optimizations:
+ * - Wrapped in React.memo to prevent unnecessary re-renders
+ * - Uses useRef to track previous value without causing re-renders
+ * - Uses react-native-reanimated for native thread animations
+ * - Animation callbacks are memoized with useCallback
  */
-export const AnimatedValue: React.FC<AnimatedValueProps> = ({
-  value,
-  containerClassName,
-  textClassName,
-}) => {
-  // Memoize chars array for performance; splits value into characters
-  const chars = React.useMemo<string[]>(() => value.split(""), [value]);
+export const AnimatedValue = React.memo<AnimatedValueProps>(
+  ({ value, containerClassName, textClassName }) => {
+    // Shared values for native thread animations (better performance than Animated API)
+    const opacity = useSharedValue(1);
+    const scale = useSharedValue(1);
 
-  return (
-    <View className={cn("flex flex-row items-center", containerClassName)}>
-      {chars.map((char: string, idx: number) => (
-        <AnimatedCharacter
-          key={`char-${idx}`}
-          char={char}
-          textClassName={textClassName}
-          index={idx}
-        />
-      ))}
-    </View>
-  );
-};
+    // Track previous value to detect changes without causing re-renders
+    const prevValue = useRef(value);
+
+    // Memoized animation sequence to prevent recreation on every render
+    const triggerAnimation = useCallback(() => {
+      // First phase: fade out and scale down using centralized animation system
+      opacity.value = motion.withTimingQuick(ANIMATION_CONFIG.FADE_OPACITY);
+      scale.value = motion.withTimingQuick(ANIMATION_CONFIG.SCALE_VALUE);
+
+      // Second phase: fade in and scale back up after a brief delay
+      setTimeout(() => {
+        opacity.value = motion.withTimingQuick(1);
+        scale.value = motion.withTimingQuick(1);
+      }, 150); // Brief delay to create the flash effect
+    }, [opacity, scale]);
+
+    // Effect to detect value changes and trigger animations
+    useEffect(() => {
+      // Only animate if the value has actually changed
+      if (value !== prevValue.current) {
+        triggerAnimation();
+        // Update ref to new value for next comparison
+        prevValue.current = value;
+      }
+    }, [value, triggerAnimation]);
+
+    // Memoized animated style to prevent unnecessary style recalculations
+    const animatedStyle = useAnimatedStyle(() => {
+      return {
+        opacity: opacity.value,
+        transform: [{ scale: scale.value }],
+      };
+    }, [opacity.value, scale.value]);
+
+    return (
+      <Animated.View
+        style={animatedStyle}
+        className={cn("flex flex-row items-center", containerClassName)}
+      >
+        <Text className={textClassName}>{value}</Text>
+      </Animated.View>
+    );
+  },
+);
+
+// Display name for React DevTools debugging
+AnimatedValue.displayName = "AnimatedValue";

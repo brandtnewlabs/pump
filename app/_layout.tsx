@@ -1,11 +1,20 @@
 import "../global.css";
 
 import { Tabs } from "expo-router";
+import {
+  ReanimatedLogLevel,
+  configureReanimatedLogger,
+} from "react-native-reanimated";
 
 import { useFontLoader } from "@/hooks/useFontLoader";
 import tailwindColors from "@/tailwind-colors";
 import { Octicons } from "@expo/vector-icons";
 import { BottomTabNavigationOptions } from "@react-navigation/bottom-tabs";
+
+configureReanimatedLogger({
+  level: ReanimatedLogLevel.warn,
+  strict: false, // Reanimated runs in strict mode by default
+});
 
 // Types
 interface TabConfig {
@@ -40,6 +49,10 @@ const TAB_SCREEN_OPTIONS: BottomTabNavigationOptions = {
 
 export default function RootLayout() {
   const { fontsLoaded } = useFontLoader();
+
+  if (!fontsLoaded) {
+    return null; // TODO: Add splash screen hide logic here
+  }
 
   const renderTabIcon = (iconName: keyof typeof Octicons.glyphMap) => {
     const TabIcon = ({ color }: { color: string }) => (
