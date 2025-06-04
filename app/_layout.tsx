@@ -1,11 +1,65 @@
 import "../global.css";
 
-import { Stack } from "expo-router";
+import { Tabs } from "expo-router";
+
+import tailwindColors from "@/tailwind-colors";
+import { Octicons } from "@expo/vector-icons";
+import { BottomTabNavigationOptions } from "@react-navigation/bottom-tabs";
+
+// Types
+interface TabConfig {
+  name: string;
+  title: string;
+  iconName: keyof typeof Octicons.glyphMap;
+}
+
+// Configuration
+const TAB_CONFIGS: readonly TabConfig[] = [
+  { name: "(home)", title: "Home", iconName: "home" },
+  { name: "search", title: "Search", iconName: "search" },
+  { name: "chat", title: "Chat", iconName: "comment-discussion" },
+  { name: "portfolio", title: "Portfolio", iconName: "person" },
+  { name: "notifications", title: "Notifications", iconName: "bell" },
+] as const;
+
+const TAB_SCREEN_OPTIONS: BottomTabNavigationOptions = {
+  headerShown: false,
+  tabBarShowLabel: false,
+  tabBarStyle: {
+    backgroundColor: tailwindColors.background.primary,
+    borderTopColor: tailwindColors.base[900],
+    borderTopWidth: 1,
+  },
+  tabBarItemStyle: {
+    marginTop: 8,
+  },
+  tabBarActiveTintColor: tailwindColors.primary[400],
+  tabBarInactiveTintColor: tailwindColors.base[500],
+};
 
 export default function RootLayout() {
+  const renderTabIcon = (iconName: keyof typeof Octicons.glyphMap) => {
+    const TabIcon = ({ color }: { color: string }) => (
+      <Octicons name={iconName} size={24} color={color} />
+    );
+    TabIcon.displayName = `TabIcon-${iconName}`;
+    return TabIcon;
+  };
+
+  const renderTabScreen = (tab: TabConfig) => (
+    <Tabs.Screen
+      key={tab.name}
+      name={tab.name}
+      options={{
+        title: tab.title,
+        tabBarIcon: renderTabIcon(tab.iconName),
+      }}
+    />
+  );
+
   return (
-    <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="(tabs)" />
-    </Stack>
+    <Tabs screenOptions={TAB_SCREEN_OPTIONS}>
+      {TAB_CONFIGS.map(renderTabScreen)}
+    </Tabs>
   );
 }
