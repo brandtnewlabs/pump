@@ -1,5 +1,3 @@
-import React from "react";
-
 import { UseQueryOptions, useQuery } from "@tanstack/react-query";
 
 // Re-export the interface for convenience
@@ -53,16 +51,9 @@ async function fetchPumpIcon(ticker: string): Promise<PumpTokenMeta | null> {
 
   const normalizedTicker = ticker.trim().toUpperCase();
 
-  // Debug logging
-  console.log(
-    `[fetchPumpIcon] Fetching data for: ${normalizedTicker} via DexScreener`,
-  );
-
   try {
     // Use DexScreener API - free and excellent for Solana meme coins
     const searchUrl = `https://api.dexscreener.com/latest/dex/search/?q=${normalizedTicker}`;
-
-    console.log(`[fetchPumpIcon] Making DexScreener request to: ${searchUrl}`);
 
     const searchResponse = await fetchWithTimeout(searchUrl, {
       method: "GET",
@@ -71,16 +62,7 @@ async function fetchPumpIcon(ticker: string): Promise<PumpTokenMeta | null> {
       },
     });
 
-    console.log(
-      `[fetchPumpIcon] DexScreener response status: ${searchResponse.status}`,
-    );
-
     if (!searchResponse.ok) {
-      console.log(
-        `[fetchPumpIcon] Error response body for ${normalizedTicker}:`,
-        await searchResponse.text(),
-      );
-
       if (searchResponse.status === 429) {
         const pumpError: PumpIconError = {
           type: "rate_limit",
@@ -107,7 +89,6 @@ async function fetchPumpIcon(ticker: string): Promise<PumpTokenMeta | null> {
     }
 
     const data = await searchResponse.json();
-    console.log(`[fetchPumpIcon] DexScreener response:`, data);
 
     // Find Solana token with matching symbol
     const solanaToken = data.pairs?.find(
@@ -118,13 +99,8 @@ async function fetchPumpIcon(ticker: string): Promise<PumpTokenMeta | null> {
     );
 
     if (!solanaToken) {
-      console.log(
-        `[fetchPumpIcon] No Solana token found for: ${normalizedTicker}`,
-      );
       return null;
     }
-
-    console.log(`[fetchPumpIcon] Found Solana token:`, solanaToken);
 
     // Determine which token matches our symbol
     const isBaseToken =
@@ -134,13 +110,8 @@ async function fetchPumpIcon(ticker: string): Promise<PumpTokenMeta | null> {
       : solanaToken.quoteToken;
 
     if (!tokenInfo) {
-      console.log(
-        `[fetchPumpIcon] No token info found for: ${normalizedTicker}`,
-      );
       return null;
     }
-
-    console.log(`[fetchPumpIcon] Token info:`, tokenInfo);
 
     // Extract image URL from the info object which contains imageUrl
     const imageUrl = solanaToken.info?.imageUrl || tokenInfo.logo || "";
@@ -152,10 +123,6 @@ async function fetchPumpIcon(ticker: string): Promise<PumpTokenMeta | null> {
       mint: tokenInfo.address || "",
     };
 
-    console.log(
-      `[fetchPumpIcon] Final result for ${normalizedTicker}:`,
-      result,
-    );
     return result;
   } catch (error) {
     console.error(
@@ -242,12 +209,6 @@ export function usePumpIconDexScreener(
     staleTime = 24 * 60 * 60 * 1000, // 24 hours default
     gcTime = 48 * 60 * 60 * 1000, // 48 hours default
   } = options;
-
-  // Debug logging
-  React.useEffect(() => {
-    console.log(`[usePumpIconDexScreener] Loading ticker: ${ticker}`);
-    console.log(`[usePumpIconDexScreener] Enabled: ${enabled}`);
-  }, [ticker, enabled]);
 
   const queryOptions: UseQueryOptions<
     PumpTokenMeta | null,
