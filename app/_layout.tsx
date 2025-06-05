@@ -7,6 +7,7 @@ import {
 } from "react-native-reanimated";
 
 import { useFontLoader } from "@/hooks/useFontLoader";
+import { Providers } from "@/lib/providers";
 import tailwindColors from "@/tailwind-colors";
 import { Octicons } from "@expo/vector-icons";
 import { BottomTabNavigationOptions } from "@react-navigation/bottom-tabs";
@@ -74,8 +75,10 @@ export default function RootLayout() {
   );
 
   return (
-    <Tabs screenOptions={TAB_SCREEN_OPTIONS}>
-      {TAB_CONFIGS.map(renderTabScreen)}
-    </Tabs>
+    <Providers>
+      <Tabs screenOptions={TAB_SCREEN_OPTIONS}>
+        {TAB_CONFIGS.map(renderTabScreen)}
+      </Tabs>
+    </Providers>
   );
 }

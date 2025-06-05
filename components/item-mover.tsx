@@ -8,6 +8,7 @@ import { formatAge } from "@/lib/time";
 
 import { LabelValue } from "./label-value";
 import { ProgressBar } from "./progress-bar";
+import { TokenIcon } from "./token-icon";
 
 interface ItemMoverProps {
   /** The ticker symbol for the cryptocurrency/token */
@@ -18,12 +19,13 @@ interface ItemMoverProps {
  * ItemMover Component
  *
  * Displays comprehensive information about a cryptocurrency token including:
- * - Token name, ticker symbol, and placeholder logo
+ * - Token name, ticker symbol, and real token logo via TokenIcon
  * - Progress bar showing completion towards a milestone
  * - Age, market cap, and all-time high metrics
  *
  * Optimized for performance with React.memo and memoized calculations.
  * Layout uses a 3:1 ratio split between main content and metrics.
+ * Now features real token icons loaded from DexScreener API with caching.
  */
 export const ItemMover = React.memo<ItemMoverProps>(({ ticker }) => {
   // Fetch all ticker-related data using our custom hook
@@ -58,7 +60,13 @@ export const ItemMover = React.memo<ItemMoverProps>(({ ticker }) => {
         {/* Loading skeleton matching the actual layout structure */}
         <View className="flex w-9/12 flex-col gap-y-2 pr-2">
           <View className="flex flex-row gap-x-2">
-            <View className="h-14 w-14 animate-pulse rounded bg-background-tertiary" />
+            {/* Token icon with loading state */}
+            <TokenIcon
+              ticker={ticker}
+              size="lg"
+              showLoading={true}
+              enabled={false} // Don't fetch during ticker data loading
+            />
             <View className="flex flex-1 flex-col justify-center gap-y-1">
               <View className="h-4 animate-pulse rounded bg-background-tertiary" />
               <View className="h-3 w-16 animate-pulse rounded bg-background-tertiary" />
@@ -82,8 +90,14 @@ export const ItemMover = React.memo<ItemMoverProps>(({ ticker }) => {
       <View className="flex w-9/12 flex-col gap-y-2 pr-2">
         {/* Token header section with logo, name, and action area */}
         <View className="flex flex-row gap-x-2">
-          {/* Token logo placeholder - 56x56px (w-14 h-14) */}
-          <View className="h-14 w-14 rounded bg-background-tertiary" />
+          {/* Real token logo with fallback - 56x56px (lg size) */}
+          <TokenIcon
+            ticker={ticker}
+            size="lg"
+            showLoading={true}
+            showError={true}
+            enabled={true}
+          />
 
           {/* Token identification section */}
           <View className="flex flex-1 flex-col justify-center gap-y-1">
