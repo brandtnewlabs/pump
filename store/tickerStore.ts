@@ -2,7 +2,7 @@ import { create } from "zustand";
 
 import { MEME_TOKENS } from "@/constants/data";
 
-const UPDATE_INTERVAL_MS = 5000;
+const UPDATE_INTERVAL_MS = 1000;
 
 /**
  * Represents the real-time data for a cryptocurrency ticker
