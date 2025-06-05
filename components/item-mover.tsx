@@ -119,7 +119,7 @@ export const ItemMover = React.memo<ItemMoverProps>(({ ticker }) => {
           </View>
 
           {/* Mini price chart - replaces the placeholder */}
-          <View className="flex h-12 flex-1">
+          <View className="flex h-12 flex-1 bg-transparent">
             <Graph
               series={graphData}
               loading={graphLoading}

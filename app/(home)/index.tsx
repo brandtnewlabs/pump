@@ -3,6 +3,8 @@ import { View } from "react-native";
 
 import { ItemMover } from "@/components/item-mover";
 import { TICKERS } from "@/constants/data";
+import { useAppFocus } from "@/hooks/useAppFocus";
+import { useScrollState } from "@/hooks/useScrollState";
 import { useTickerStore } from "@/store/tickerStore";
 import { LegendList, LegendListRenderItemProps } from "@legendapp/list";
 
@@ -33,6 +35,9 @@ const UNIQUE_TICKERS = Array.from(
 export default function Screen() {
   const initializeTickers = useTickerStore((state) => state.initializeTickers);
   const isInitialized = useTickerStore((state) => state.isInitialized);
+  const isPaused = useTickerStore((state) => state.isPaused);
+  const pauseUpdates = useTickerStore((state) => state.pauseUpdates);
+  const resumeUpdates = useTickerStore((state) => state.resumeUpdates);
 
   // Initialize ticker store on mount
   useEffect(() => {
@@ -40,6 +45,30 @@ export default function Screen() {
       initializeTickers(UNIQUE_TICKERS);
     }
   }, [initializeTickers, isInitialized]);
+
+  // Cleanup on unmount - ensure updates are resumed if paused
+  useEffect(() => {
+    return () => {
+      if (isPaused) {
+        resumeUpdates("scroll");
+        resumeUpdates("focus");
+      }
+    };
+  }, [isPaused, resumeUpdates]);
+
+  // Set up app focus detection to pause when screen/app loses focus
+  useAppFocus({
+    onFocusLost: () => pauseUpdates("focus"),
+    onFocusGained: () => resumeUpdates("focus"),
+  });
+
+  // Set up scroll state detection with ticker store integration
+  const scrollHandlers = useScrollState({
+    pauseDelay: 150, // Start pausing updates 150ms after scroll begins
+    resumeDelay: 400, // Resume updates 400ms after scroll ends
+    onScrollStart: () => pauseUpdates("scroll"),
+    onScrollEnd: () => resumeUpdates("scroll"),
+  });
 
   const renderItem = useCallback(
     ({ item }: LegendListRenderItemProps<TickerItem>) => {
@@ -65,6 +94,9 @@ export default function Screen() {
         maintainVisibleContentPosition
         contentContainerStyle={{ paddingVertical: 16, paddingHorizontal: 4 }}
         ItemSeparatorComponent={ItemSeparatorComponent}
+        onScrollBeginDrag={scrollHandlers.onScrollBeginDrag}
+        onScrollEndDrag={scrollHandlers.onScrollEndDrag}
+        onMomentumScrollEnd={scrollHandlers.onMomentumScrollEnd}
       />
     </View>
   );
