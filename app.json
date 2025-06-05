@@ -14,7 +14,8 @@
     "icon": "./assets/images/icon.png",
     "ios": {
       "bundleIdentifier": "com.brandtnewlabs.pump",
-      "supportsTablet": false
+      "supportsTablet": false,
+      "appleTeamId": "MCL33ZBD7G"
     },
     "name": "Pump",
     "newArchEnabled": true,

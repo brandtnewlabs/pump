@@ -1,6 +1,7 @@
 import "../global.css";
 
 import { Tabs } from "expo-router";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import {
   ReanimatedLogLevel,
   configureReanimatedLogger,
@@ -75,10 +76,12 @@ export default function RootLayout() {
   );
 
   return (
-    <Providers>
-      <Tabs screenOptions={TAB_SCREEN_OPTIONS}>
-        {TAB_CONFIGS.map(renderTabScreen)}
-      </Tabs>
-    </Providers>
+    <GestureHandlerRootView>
+      <Providers>
+        <Tabs screenOptions={TAB_SCREEN_OPTIONS}>
+          {TAB_CONFIGS.map(renderTabScreen)}
+        </Tabs>
+      </Providers>
+    </GestureHandlerRootView>
   );
 }

@@ -3,9 +3,12 @@ import { Text, View } from "react-native";
 import Animated from "react-native-reanimated";
 
 import { useTickerData } from "@/hooks/useTickerData";
+import { useTickerGraphData } from "@/hooks/useTickerGraphData";
 import { formatCurrency } from "@/lib/currency";
 import { formatAge } from "@/lib/time";
+import { GraphDisplayMode } from "@/types/graph";
 
+import { Graph } from "./graph";
 import { LabelValue } from "./label-value";
 import { ProgressBar } from "./progress-bar";
 import { TokenIcon } from "./token-icon";
@@ -21,16 +24,21 @@ interface ItemMoverProps {
  * Displays comprehensive information about a cryptocurrency token including:
  * - Token name, ticker symbol, and real token logo via TokenIcon
  * - Progress bar showing completion towards a milestone
+ * - Mini price chart showing recent price movements via Graph component
  * - Age, market cap, and all-time high metrics
  *
  * Optimized for performance with React.memo and memoized calculations.
  * Layout uses a 3:1 ratio split between main content and metrics.
  * Now features real token icons loaded from DexScreener API with caching.
+ * Graph integration shows 24-hour price trends aligned with progress data.
  */
 export const ItemMover = React.memo<ItemMoverProps>(({ ticker }) => {
   // Fetch all ticker-related data using our custom hook
   const { progress, mcap, ath, tokenName, createdAt, isLoading } =
     useTickerData(ticker);
+
+  // Fetch graph data for the mini price chart
+  const { graphData, isLoading: graphLoading } = useTickerGraphData(ticker);
 
   // Memoize expensive calculations to prevent unnecessary re-computations
   const memoizedValues = useMemo(() => {
@@ -71,7 +79,8 @@ export const ItemMover = React.memo<ItemMoverProps>(({ ticker }) => {
               <View className="h-4 animate-pulse rounded bg-background-tertiary" />
               <View className="h-3 w-16 animate-pulse rounded bg-background-tertiary" />
             </View>
-            <View className="flex flex-1 animate-pulse rounded bg-background-secondary" />
+            {/* Graph loading skeleton */}
+            <View className="flex h-12 flex-1 animate-pulse rounded bg-background-secondary" />
           </View>
           <View className="h-1 animate-pulse rounded bg-background-tertiary" />
         </View>
@@ -88,7 +97,7 @@ export const ItemMover = React.memo<ItemMoverProps>(({ ticker }) => {
     <Animated.View className="flex flex-row">
       {/* Main content area - 75% width (9/12) */}
       <View className="flex w-9/12 flex-col gap-y-2 pr-2">
-        {/* Token header section with logo, name, and action area */}
+        {/* Token header section with logo, name, and mini price chart */}
         <View className="flex flex-row gap-x-2">
           {/* Real token logo with fallback - 56x56px (lg size) */}
           <TokenIcon
@@ -109,8 +118,24 @@ export const ItemMover = React.memo<ItemMoverProps>(({ ticker }) => {
             </Text>
           </View>
 
-          {/* Action/interaction area - placeholder for future features */}
-          <View className="flex flex-1 rounded bg-background-secondary" />
+          {/* Mini price chart - replaces the placeholder */}
+          <View className="flex h-12 flex-1">
+            <Graph
+              series={graphData}
+              loading={graphLoading}
+              displayMode={GraphDisplayMode.Currency}
+              strokeWidth={1.5}
+              graphVerticalPadding={5}
+              graphHorizontalPadding={2}
+              withAreaGradient={true}
+              withLabelsYAxis={false}
+              withLabelsXAxis={false}
+              withGridLines={false}
+              withCursor={false}
+              withPanGesture={false}
+              withLegend={false}
+            />
+          </View>
         </View>
 
         {/* Progress visualization - shows completion towards milestone */}
